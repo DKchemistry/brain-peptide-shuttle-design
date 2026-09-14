@@ -86,9 +86,19 @@ For example, here are five macrocycle backbones I generated against Chain A of 6
 
 These macrocycles were simulated at what should be the alpha helical interface between dimers of TfR1. So, unconstrained generation is likely not possible here. It would be very interesting to see what unconstrained generation would look like if given the full multimeric complex, but the computational cost scales agressively with residue count, so we will leave that for another day. For now, we can condition on the hot spot corresponding to the exposed beta strand in the apical domain. 
 
+
 ![alt text](tf1r-pymol/hotspot_209_212.png)
 
-All of the design were generated with some alpha helical structure. Some of which are obviously poor, with carbonyls visibly pointing directly at each other between the interface. That is not something I think sequence decoration or physics-based relaxation can entirely rescue, which would in turn be a lot of wasted compute on the cyclic AlphaFold2 oracle predictions. Better initial design in terms of beta strand complementarity would be ideal. The Baker Lab has actually adressed this problem directly in the context of peptide design ([Sappington et al., 2026](https://doi.org/10.1038/s41467-025-67866-3)). They provide a script to calculate an adjacency matrix between a desired binder of specified length and given target, matching the desired beta strands between binder and target. This has improved *in silico* success rates of beta sheet like interactions, as well as provided experimentally validated beta strand/beta sheet binders. I tried this here. Of the 10 binder generated, half of them have recognizable beta strand geometry in the binder. However, the N-C macrocycle structure was not maintained. Whether this is a fundamental limitation imposed by the beta strand adjacency matrix, or bug in it's implementation in RFpeptides, I am not sure presently sure. I do plan to investigate. It may also be limited sampling, which is hard to scale here due to compute constraints.  
+
+All of the design were generated with some alpha helical structure. Some of which are obviously poor, with carbonyls visibly pointing directly at each other between the interface. That is not something I think sequence decoration or physics-based relaxation can entirely rescue, which would in turn be a lot of wasted compute on the cyclic AlphaFold2 oracle predictions. Better initial design in terms of beta strand complementarity would be ideal. The Baker Lab has actually adressed this problem directly in the context of peptide design ([Sappington et al., 2026](https://doi.org/10.1038/s41467-025-67866-3)). They provide a script to calculate an adjacency matrix between a desired binder of specified length and given target, matching the desired beta strands between binder and target. This has improved *in silico* success rates of beta sheet like interactions, as well as provided experimentally validated beta strand/beta sheet binders.
+
+I tried this here. Of the 10 binder generated, half of them have recognizable beta strand geometry in the binder. Some of them appear to have excellent backbone complementarity. However, the N-C macrocycle structure was not maintained. 
+
+
+![alt text](tf1r-pymol/beta4.png)
+
+
+Whether this is a fundamental limitation imposed by the beta strand adjacency matrix, or bug in it's implementation in RFpeptides, I am not sure presently sure. I do plan to investigate. It may also be limited sampling, which is hard to scale here due to compute constraints.  
 
 
 
