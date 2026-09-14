@@ -212,6 +212,21 @@ for i in range(5):
     )
     cmd.load(pdb, f"tfr1_macrocycle_209-212_{i}")
     cmd.align(f"tfr1_macrocycle_209-212_{i} and Chain A", "6WRW and Chain A")
+
+for i in [0, 1, 6, 7, 8]:
+    pdb = os.path.join(
+        script_dir,
+        "..",
+        "proof-of-concept",
+        "rfd_tf1r_macrocycle",
+        "mps",
+        "interface_beta4_A209-212_len14",
+        f"tfr1_beta4_{i}.pdb",
+    )
+
+    cmd.load(pdb, f"tfr1_beta4_{i}")
+    cmd.align(f"tfr1_beta4_{i} and Chain B", "6WRW and Chain A")
+  
 python end
 
 # ray 5000, 1000
@@ -235,6 +250,41 @@ set grid_slot, 5, tfr1_macrocycle_209-212_4
 viewport 2000, 400
 
 scene hotspot_209_212, store
+
+set grid_mode, 0
+
+disable all 
+
+enable tfr1_beta4_0
+enable tfr1_beta4_1
+enable tfr1_beta4_6
+enable tfr1_beta4_7
+enable tfr1_beta4_8
+
+# show sticks of beta strand in chain B, the receptor 
+show sticks, (tfr1_beta4_0 or tfr1_beta4_1 or tfr1_beta4_6 or tfr1_beta4_7 or tfr1_beta4_8) and chain B and resi 102-106
+
+# show sticks of the beta strand in designed peptides
+show sticks, \
+    ((tfr1_beta4_0 or tfr1_beta4_1) and chain A and resi 8-11) or \
+    (tfr1_beta4_6 and chain A and resi 5-8) or \
+    (tfr1_beta4_7 and chain A and resi 7-11) or \
+    (tfr1_beta4_8 and chain A and resi 1-4)
+
+set_view (\
+    -0.112188376,    0.934958279,    0.336473882,\
+    -0.991853058,   -0.125742778,    0.018720441,\
+     0.059817575,   -0.331638902,    0.941482902,\
+    -0.004349278,   -0.003167443,  -52.620052338,\
+    71.608222961,  -62.351116180,   69.648139954,\
+  -157.162063599,  233.143890381,  -20.000000000 )
+
+viewport 2000, 400
+
+# ray 5000, 1000
+# png beta4
+
+scene beta4, store 
 
 # -------------------------------------------------------------------------
 # OPTIONAL CONVENIENCE COMMANDS
