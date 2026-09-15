@@ -47,6 +47,14 @@ set_color cofactor_Ca,     [0.45, 0.75, 0.82]
 set_color cofactor_Fe,     [0.88, 0.48, 0.25]
 set_color cofactor_CO3,    [0.78, 0.78, 0.78]
 
+# 5 binder colors 
+
+set_color pastel_blue, [0.45, 0.68, 0.86]
+set_color pastel_orange, [0.90, 0.62, 0.38]
+set_color pastel_green, [0.48, 0.76, 0.56]
+set_color pastel_purple, [0.70, 0.55, 0.82]
+set_color pastel_gold, [0.88, 0.78, 0.38]
+
 # -------------------------------------------------------------------------
 # 3. PUT EVERYTHING INTO THE SAME TfR1 REFERENCE FRAME
 # -------------------------------------------------------------------------
@@ -238,6 +246,14 @@ enable tfr1_macrocycle_209-212_2
 enable tfr1_macrocycle_209-212_3
 enable tfr1_macrocycle_209-212_4
 
+color domain_apical, (tfr1_macrocycle_209-212_* and chain A and elem C)
+set cartoon_color, domain_apical, (tfr1_macrocycle_209-212_* and chain A)
+color pastel_blue,   (tfr1_macrocycle_209-212_0 and chain B and elem C)
+color pastel_orange, (tfr1_macrocycle_209-212_1 and chain B and elem C)
+color pastel_green,  (tfr1_macrocycle_209-212_2 and chain B and elem C)
+color pastel_purple, (tfr1_macrocycle_209-212_3 and chain B and elem C)
+color pastel_gold,    (tfr1_macrocycle_209-212_4 and chain B and elem C)
+
 set grid_mode, 1
 set grid_max, 5
 
@@ -249,9 +265,30 @@ set grid_slot, 5, tfr1_macrocycle_209-212_4
 
 viewport 2000, 400
 
-scene hotspot_209_212, store
+scene hotspot_209_212_grid, store
+
+# toggle sticks for macrocycles
+# show sticks, chain B and tfr1_macrocycle_209-212_*
 
 set grid_mode, 0
+
+set_view (\
+     0.013367457,    0.996410966,   -0.083305068,\
+    -0.999762595,    0.012057815,   -0.016302342,\
+    -0.015237227,    0.083509520,    0.996366322,\
+    -0.004464183,   -0.003602166,  -78.708885193,\
+    67.606384277,  -63.884799957,   64.181854248,\
+  -112.804878235,  242.018951416,  -20.000000000 )
+
+
+scene hotspot_209_212, store
+
+# inspect results of ../scripts/select_distal_site.py
+# tfr1_macrocycle_0.pdb: B11 (sequence position 11, receptor clearance 12.02 Å, outward cosine 0.88, peptide clearance 4.22 Å)
+# tfr1_macrocycle_1.pdb: B7 (sequence position 7, receptor clearance 12.34 Å, outward cosine 0.83, peptide clearance 4.01 Å)
+# tfr1_macrocycle_2.pdb: B1 (sequence position 1, receptor clearance 13.71 Å, outward cosine 0.96, peptide clearance 7.19 Å)
+# tfr1_macrocycle_3.pdb: B11 (sequence position 11, receptor clearance 13.53 Å, outward cosine 0.84, peptide clearance 7.65 Å)
+# tfr1_macrocycle_4.pdb: B8 (sequence position 8, receptor clearance 12.73 Å, outward cosine 0.98, peptide clearance 5.01 Å)
 
 disable all 
 
