@@ -4,7 +4,7 @@ By David Kouvchinov, PhD
 
 ## Motivation
 
-I am interested in applying for a post-doctoral position regarding the de novo design of brain-targeting peptides in the context of ischemic stroke, as part of a larger interdisciplinary project. Below, I explore some of the background surrounding ischemic stroke, related therapeutic targets, promising leads/clinical efforts, and the use of peptides shuttles to target the brain. This exploration led me to consider that targeting Transferrin Receptor 1 (TfR1) with lariat macrocycles may allow for receptor-mediated transcytosis of PSD-95 inhibitor payload across the blood brain barrier (BBB). Following, I apply the de novo peptide/protein design, RFpeptides, to design potential TfR1 binding peptides that may be suitable in this context.
+I am interested in applying for a post-doctoral position regarding the de novo design of brain-targeting peptides in the context of ischemic stroke, as part of a larger interdisciplinary project. Below, I explore some of the background surrounding ischemic stroke, related therapeutic targets, promising leads/clinical efforts, and the use of peptides shuttles to target the brain. This exploration led me to consider that targeting Transferrin Receptor 1 (TfR1) with lariat macrocycles may allow for receptor-mediated transcytosis of PSD-95 inhibitor payloads across the blood brain barrier (BBB). Following, I apply the de novo peptide design platform, RFpeptides, to design potential TfR1 binding peptides that may be suitable in this context.
 
 ## Background
 
@@ -32,7 +32,7 @@ Finally, there has been a revolution of protein design methods following the suc
 
 In my view, there are a few ways to approach the design of a TfR1 peptide binder that can also bind the PDZ domains of PSD-95 while hopefully having reasonable plasma stability. One appealing approach is peptide macrocycles. Given that the project describes the involvement of peptide synthesis, I assume that the chemistry arm of the work is perfectly capable of synthesizing various macrocycles using SPPS with a macrocyclization step (or some fairly equivalent synthetic chemistry). Beyond synthetic accessibility, my preference for pursuing macrocycles stems from a few factors. With respect to drug-like properties, macrocycles are often associated with improved binding affinity, higher plasma stability, and improved cellular penetration. Additionally, while most of the recent deep learning methods for de novo protein design seem to have primarily explored proteins or "miniproteins" of roughly 80–150 residues, RFpeptides is designed for macrocycles with experimentally validated designs in the 12–18 residue range (RFpeptides: [Rettie et al., 2025](https://doi.org/10.1038/s41589-025-01929-w)).
 
-The more risky element of using a macrocycle is that part of the pharmacophore from AVLX-144 (or NR2B9C) that binds the PDZ domains includes the C-terminal free COOH (IETDV-COOH) and we may not be able to get away with X-IETDV-Y type designs in our macrocycles. One workaround for this could be a lariat macrocycle. Lariant macrocycles look like lassos, where a macrocycle ring is formed, while exposing some side chain or other synthetic handle toward derivatization to a linker (or some desired functionality). We could imagine a lariat macrocycle with meant to bind TfR1 while also exposing a linker to connect to IETDV-COOH. Schematically, it would look something like this if we have a solvent exposed lysine side chain:
+The more risky element of using a macrocycle is that part of the pharmacophore from AVLX-144 (or NR2B9c) that binds the PDZ domains includes the C-terminal free COOH (IETDV-COOH) and we may not be able to get away with X-IETDV-Y type designs in our macrocycles. One workaround for this could be a lariat macrocycle. Lariat macrocycles look like lassos, where a macrocycle ring is formed, while exposing some side chain or other synthetic handle toward derivatization to a linker (or some desired functionality). We could imagine a lariat macrocycle with meant to bind TfR1 while also exposing a linker to connect to IETDV-COOH. Schematically, it would look something like this if we have a solvent exposed lysine side chain:
 
 ```
              TfR1-binding macrocycle
@@ -62,9 +62,11 @@ The apical domain/2DS25.5 interface is supported by backbone residue interaction
 
 ### RFpeptides Methodology
 
-Methodologically, RFpeptides works similar to the RFdiffusion (rfd) de novo design workflow. It is useful to start with RFdiffusion methodology and then discuss the changes RFpeptides made after. The basic rfd design process is `backbone generation` -> `sequence design` -> `oracle`. These steps are all highly modular. For example, RFdiffusion can be used to generate a variety of backbones based on conditioning parameters (e.g., binder conditioning, hot spot conditioning, motif conditioning) and auxillary potentials/steered sampling. ProteinMPNN (or another scaffold decoration model) can be used to generate sequences that fit these backbones, in either biased or unbiased manners. AlphaFold2 (or another performant structure prediction model, RF2, ESMFold, etc) can be used to validate/score the designs. It is generally advised to use a model orthogonal to the source of the diffusion model to act as the oracle for the designs, but this is not strictly required. 
+Methodologically, RFpeptides works similar to the RFdiffusion (rfd) de novo design workflow. It is useful to start with RFdiffusion methodology and then discuss the changes RFpeptides made after. The basic rfd design process is `backbone generation` -> `sequence design` -> `oracle`. These steps are all highly modular. For example, RFdiffusion can be used to generate a variety of backbones based on conditioning parameters (e.g., binder conditioning, hot spot conditioning, motif conditioning) and auxillary potentials/steered sampling. ProteinMPNN (or another scaffold decoration model) can be used to generate sequences that fit these backbones, in either biased or unbiased manners. AlphaFold2 (or another performant structure prediction model, RF2, ESMFold, etc) can be used to validate/score the designs. It is generally advised to use a model orthogonal to the source of the diffusion model to act as the oracle for the designs, but this is not strictly required.
 
-RFpeptides works almost identically. A relatively small and clever change is made to allow for macrocycle generation and validation/scoring without requiring retraining any of the models. AlphaFold2 and RosettaFold2 (which RFdiffusion is extended from) all have some 2D pair representation (z) of the residues i,j in the query sequence. So the relationship of residue 1 and 2 is z_1_2, residue 1 and residue 2 is z_1_3, etc, forming a table of features like so:
+#### Backbone Generation
+
+RFpeptides works almost identically to the parent RFdiffusion frameworks. A relatively small and clever change is made to allow for macrocycle backbone generation and validation/scoring without requiring retraining any of the models. AlphaFold2 and RosettaFold2 (which RFdiffusion is extended from) all have some 2D pair representation (z) of the residues i,j in the query sequence. So the relationship of residue 1 and 2 is z_1_2, residue 1 and residue 2 is z_1_3, etc, forming a table of features like so:
 
 ```
 2D pair representation z
@@ -78,37 +80,60 @@ s.  3  │ z31 z32 z33 z34
 i   4  │ z41 z42 z43 z44
 ```
 
-Featurized in the z_i_j terms here is, amongst other things, the relative positioning (sometimes called residue offset) of the residues, e.g., residue 4 is +3 relative to residue 1 in the table above. If we consider a peptide of length 10, then residue 10 is +9 to residue 1. In RFpeptides, they apply a "macrocycle offset" to the pair representation in RosettaFold, RFdiffusion and AlphaFold2. After the halfway point (i.e., residue 6, +5 to residue 1), the positional encoding is instead treated as cyclic instead of a linear. So, at residue 7 we are at -4 to residue 1 instead of +6. The final residue will be -1 relative to the initial residue. Despite the immense amount of transformations that occur through the rest of the network, this 2D relative positioning does indeed transfer all the way to 3D space.
+Featurized in the z_i_j terms here is, amongst other things, the relative positioning (sometimes called residue offset) of the residues, e.g., residue 4 is +3 relative to residue 1 in the table above. If we consider a peptide of length 10, then residue 10 is +9 to residue 1. In the RFpeptides workflow, they apply a "macrocycle offset" to the pair representation in RosettaFold, RFdiffusion and AlphaFold2. After the halfway point (i.e., residue 6, +5 to residue 1), the positional encoding is instead treated as cyclic instead of a linear. So, at residue 7 we are at -4 to residue 1 instead of +6. The final residue will be -1 relative to the initial residue. Despite the immense amount of transformations that occur through the rest of the network, this 2D relative positioning does indeed transfer all the way to 3D space.
 
 For example, here are five macrocycle backbones I generated against Chain A of 6WRW, using only binder conditioning and a sequence length of 15, via rfd:
 
 ![alt text](proof-of-concept/rfd_tf1r_macrocycle/mps_5_backbones/tfr1_macrocycle_B.png)
 
-These macrocycles were simulated at what should be the alpha helical interface between dimers of TfR1. So, unconstrained generation is likely not possible here. It would be very interesting to see what unconstrained generation would look like if given the full multimeric complex, but the computational cost scales agressively with residue count, so we will leave that for another day. For now, we can condition on the hot spot corresponding to the exposed beta strand in the apical domain. 
+These macrocycles were simulated at what should be the alpha helical interface between dimers of TfR1. So, unconstrained generation is likely not possible here. It would be very interesting to see what unconstrained generation would look like if given the full multimeric complex, but the computational cost scales agressively with residue count, so we will leave that for another day. For now, we can condition on the hot spot corresponding to the exposed beta strand in the apical domain (res. 209-212 in Chain A of 6WRW). 
 
 
 ![alt text](tf1r-pymol/hotspot_209_212.png)
 
 
-All of the design were generated with some alpha helical structure. Some of which are obviously poor, with carbonyls visibly pointing directly at each other between the interface. That is not something I think sequence decoration or physics-based relaxation can entirely rescue, which would in turn be a lot of wasted compute on the cyclic AlphaFold2 oracle predictions. Better initial design in terms of beta strand complementarity would be ideal. The Baker Lab has actually adressed this problem directly in the context of peptide design ([Sappington et al., 2026](https://doi.org/10.1038/s41467-025-67866-3)). They provide a script to calculate an adjacency matrix between a desired binder of specified length and given target, matching the desired beta strands between binder and target. This has improved *in silico* success rates of beta sheet like interactions, as well as provided experimentally validated beta strand/beta sheet binders.
+All of the designs were generated with some alpha helical structure, a known bias of diffusion based models. Some of these are obviously poor, with carbonyls visibly pointing directly at each other between the interface. That is not something I think sequence decoration or physics-based relaxation can entirely rescue, which would in turn be a lot of wasted compute on the cyclic AlphaFold2 oracle predictions. Better initial design in terms of beta strand complementarity would be ideal. The Baker Lab has actually adressed this problem directly in the context of peptide design ([Sappington et al., 2026](https://doi.org/10.1038/s41467-025-67866-3)). They provide a script to calculate an adjacency matrix between a desired binder of specified length and given target, matching the desired beta strands between binder and target. This has improved *in silico* success rates of beta sheet like interactions, as well as provided experimentally validated beta strand/beta sheet binders.
 
-I tried this here. Of the 10 binder generated, half of them have recognizable beta strand geometry in the binder. Some of them appear to have excellent backbone complementarity. However, the N-C macrocycle structure was not maintained. 
+I tried this here. Of the 10 binders generated, four of them have recognizable beta strand geometry in the binder. Some of which appear to have excellent backbone complementarity. However, the N-C macrocycle structure was not maintained. 
 
 
 ![alt text](tf1r-pymol/beta4.png)
 
 
-Whether this is a fundamental limitation imposed by the beta strand adjacency matrix, or bug in it's implementation in RFpeptides, I am not sure presently sure. I do plan to investigate. It may also be limited sampling, which is hard to scale here due to compute constraints.  
+Whether this is a fundamental limitation imposed by the beta strand adjacency matrix, or bug in it's implementation in RFpeptides, I am not sure presently sure. I do plan to investigate. It may also be limited sampling, which is hard to scale here due to compute constraints. Generally, I imagine scaling the compute of just the hot spot conditioned designs would eventually yield the macrocycles I am looking for.
+
+#### Sequence Decoration via ProteinMPNN & Rosetta Relax
+
+In RFpeptides, sequences were designed and minimized by iterative rounds of ProteinMPNN and Rosetta Relax, prior to the AfCyc oracle. This differs somewhat from the more "canonical" RFdiffusion workflow, which did not find that implementing a physics-based minimization step systemically improved *in silico* success rate (percentage deemed to pass by the oracle). However, this finding appears highly empirical, as work across other benchmarks indicates the opposite. The rationale for Rosetta Relax in RFpeptides is to increase sequence diversity through small local changes in the macrocycle backbone, as well as to use the derived metrics in subsequent compound selection. 
+
+As described in the original report, I will run four iterative rounds of ProteinMPNN/Rosetta Relax on the apical domain macrocycles. ProteinMPNN allows us to select which residue in the macrocycles we want to constrain to an Asp/Glu/Lys/Cys for conjugation to the lariat macrocycle. I chose to implement a hueristic in which we select the residue that corresponds to the most distal "pseudo-CB" (+- 0.5A) that points away from the apical domain (see: `scripts/select_distal_site.py`).
+
+```sh
+conda activate biopython
+python scripts/select_distal_site.py \
+    proof-of-concept/rfd_tf1r_macrocycle/mps \
+    --peptide-chain B \
+    --output proof-of-concept/rfd_tf1r_macrocycle/mps/distal_site_scores.csv
+```
+```
+tfr1_macrocycle_res_209-212_0.pdb: B7 (sequence index 7, probe clearance 12.82 Å, outward cosine 0.79, peptide clearance 4.56 Å, probe xyz = (26.421, -36.620, 0.372))
+tfr1_macrocycle_res_209-212_1.pdb: B4 (sequence index 4, probe clearance 12.01 Å, outward cosine 0.18, peptide clearance 4.51 Å, probe xyz = (23.850, -38.753, 8.291))
+tfr1_macrocycle_res_209-212_2.pdb: B10 (sequence index 10, probe clearance 12.18 Å, outward cosine 0.47, peptide clearance 4.51 Å, probe xyz = (22.905, -37.271, 2.154))
+tfr1_macrocycle_res_209-212_3.pdb: B11 (sequence index 11, probe clearance 13.08 Å, outward cosine 0.78, peptide clearance 4.24 Å, probe xyz = (26.400, -35.911, -1.317))
+tfr1_macrocycle_res_209-212_4.pdb: B7 (sequence index 7, probe clearance 12.63 Å, outward cosine 0.76, peptide clearance 4.44 Å, probe xyz = (26.023, -35.230, -2.409))
+```
+
+We can visualize that "psuedo-CB" below as the dashed line leading to a sphere. None of the designs below display an exit vector that point into the receptor itself, though more sophisticated biasing of the directional vector can be envisioned.
+
+![alt text](proof-of-concept/rfd_tf1r_macrocycle/mps/distal_site_visualization.png)
 
 
-
-#### Sequence Decoration via ProteinMPNN
 
 ## Methods
 
 ### PLIP Protein-Protein Interaction Profiler
 
-The PLIP Web Server (Schake, Bolz et al. PLIP 2025: introducing protein-protein interactions to the protein-ligand interaction profiler) was used to analyze and visualize the 2DS25.5 interactions with Tf1R (PDB 6WRW).
+The PLIP Web Server ([Schake, Bolz et al., 2025](https://doi.org/10.1093/nar/gkaf361)) was used to analyze and visualize the 2DS25.5 interactions with Tf1R (PDB 6WRW).
 
 PyMol snippet to match color profile:
 
@@ -419,7 +444,7 @@ python interface_tensors/make_interface_tensor.py \
   --binder_ss E \
   --binder_ss_len 4
 ```
-So one maddening note here, the `cyc_chains` are only internal to RFpeptides and have nothing to do with the PDB Chain field. Before I was using `a` to note the macrocycle chain. The convention seems to be the opposite, `b` for binder I guess! So, I've swtiched to `b`. It shouldn't change anything important. Obviously, don't propogate the tensor off by 1 error here. Also, I set the number of designs to 10 here, but in all likelihood I will kill the run earlier - depends on my schedule tomorrow. 
+So one maddening note here, the `cyc_chains` are only internal to RFpeptides and have nothing to do with the PDB Chain field. Before I was using `a` to note the macrocycle chain. The convention seems to be the opposite, `b` for binder I guess! So, I've swtiched to `b`. It shouldn't change anything important. Obviously, don't propogate the tensor off by 1 error here.  
 
 ```sh
 cd ~/work/rfdiffusion-rfpeptides-mps
@@ -444,6 +469,8 @@ python scripts/run_inference.py \
   diffuser.T=50 \
   'ppi.hotspot_res=[A209,A210,A211,A212]'
 ```
+
+These designs had some excellent beta strand complementarity, but the macrocycles structures were lost.
 
 ### Rosetta Foundary Install
 
@@ -576,7 +603,6 @@ PY
 
 Now it works. 
 
-###
 ### Production Run via Local (Partial) MPS Install: 5 RFpeptides-style RFdiffusions, no hot spot
 
 I was curious what sites would be targeted by a handful of designs without hot spot set up. I chose a 15-mer arbitrarily at this stage.
@@ -603,6 +629,16 @@ python scripts/run_inference.py \
 ```
 
 This approach is unlikely to work. All the design were put at the alpha helical homodimer interaction motif. The prior is too strong here. You need to force it with hot spots. 
+
+### Distal Residue Selection script
+
+Env creation: 
+
+```sh
+conda create -n biopython python=3.12 biopython numpy scipy -c conda-forge
+```
+
+
 
 draft text i don't want to delete yet
 
