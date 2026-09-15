@@ -167,6 +167,9 @@ def score_structure(pdb_path, peptide_chain_id="A", probe_distance=4.0):
                 ),
                 "outward_cosine": outward_cosine,
                 "peptide_probe_clearance_A": self_clearance,
+                "probe_x": float(probe[0]),
+                "probe_y": float(probe[1]),
+                "probe_z": float(probe[2]),
             }
         )
 
@@ -278,15 +281,16 @@ def main():
         print(
             f"{pdb_path.name}: "
             f"{args.peptide_chain}{selected['residue']} "
-            f"(sequence position {selected['sequence_index']}, "
-            f"receptor clearance "
-            f"{selected['receptor_probe_clearance_A']:.2f} Å, "
-            f"outward cosine "
-            f"{selected['outward_cosine']:.2f}, "
-            f"peptide clearance "
-            f"{selected['peptide_probe_clearance_A']:.2f} Å)"
+            f"(sequence index {selected['sequence_index']}, "
+            f"probe clearance {selected['receptor_probe_clearance_A']:.2f} Å, "
+            f"outward cosine {selected['outward_cosine']:.2f}, "
+            f"peptide clearance {selected['peptide_probe_clearance_A']:.2f} Å, "
+            f"probe xyz = "
+            f"({selected['probe_x']:.3f}, "
+            f"{selected['probe_y']:.3f}, "
+            f"{selected['probe_z']:.3f}))"
         )
-
+        
     if args.output:
         args.output.parent.mkdir(
             parents=True,
