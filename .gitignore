@@ -1,1 +1,6 @@
 *.pdb
+*.cdxml
+*.cif
+*.trb
+*.DS_Store
+*.pptx
