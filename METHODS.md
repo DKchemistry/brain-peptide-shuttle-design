@@ -295,3 +295,19 @@ python scripts/run_mpnn_relax_all.py \
   --xml RosettaRelax/fast_relax_binder_A.xml
 ```
 
+## AfCyc Oracle
+
+The `design-dir` here is the output from the ProteinMPNN/RosettaRelax step.
+
+```sh
+# the script is just a wrapper and will
+# activate afcyc env
+conda activate biopython
+
+caffeinate -i python scripts/run_afcyc_all.py \
+  --design-dir proof-of-concept/rfd_tf1r_macrocycle/iterative_design/interface_beta4_A209-212_len14_cyclicA \
+  --output-dir proof-of-concept/rfd_tf1r_macrocycle/afcyc_final/interface_beta4_A209-212_len14_cyclicA \
+  --params ~/alphafold \
+  --target-chain B \
+  --recycles 5
+```
