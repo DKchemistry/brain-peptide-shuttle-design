@@ -125,7 +125,7 @@ I refolded the ten design with AfCyc. Unfortunately, none of the designs folded 
 ![alt text](proof-of-concept/rfd_tf1r_macrocycle/afcyc_final/interface_beta4_A209-212_len14_cyclicA/afcyc_interface_beta4_A209-212_len14_cyclicA.png)
 *Figure 11. AfCyc refolding of all the macrocycle design shows floating binders.*
 
-It is difficult to assess or interpert the computational validity of this approach due to the limited sampling performed. To my knowledge, the combination of RFpeptides and B-pair conditioning has not been benchmarked. However, indepedently, both methods exhibit substantial target dependent score distributions. It may be the case that the chosen site was particularly difficult and that substantially larger sampling campaigns could produce coherent designs. 
+It is difficult to assess or interpert the computational validity of this approach due to the limited sampling performed. To my knowledge, the combination of RFpeptides and B-pair conditioning has not been benchmarked. However, indepedently, both methods exhibit substantial target dependent score distributions. It may be the case that the chosen site was particularly difficult and that substantially larger sampling campaigns could produce coherent designs. Moreover, the macrocycle size, hot spot residues, and beta pairing could likely all be iteratively optimized to generate binders with better complementarity to the receptor. Presently, the computational demands of either scaling the present design or exploring alternative designs are prohibitive. Future directions will explore methods of expediting the present workflow (e.g., residue cropping during diffusion) or alternative design platforms that are better suited for my machine. 
 
 ## Closing Thoughts
 
