@@ -111,7 +111,7 @@ In RFpeptides, sequences are decorated and the resulting macrocycle minimized by
 
 As described in the original report, I ran four iterative rounds of ProteinMPNN/Rosetta Relax on the apical domain macrocycles. ProteinMPNN allows selecting which residue in the macrocycles we want to constrain. I wanted to ensure an Asp/Glu/Lys/Cys was available at the most distal site relative to TfR1 for conjugation to the lariat macrocycle. I chose a simple hueristic in which we select the residue that corresponds to the most distal "pseudo-CB" (+- 0.5A) that points away from the apical domain as the intended derivatization site (see: `scripts/select_distal_site.py`). A visualization of those selected residues are given below, the line and sphere correspond to the intended directionality of Asp/Glu/Lys/Cys.
 
-![alt text](proof-of-concept/rfd_tf1r_macrocycle/mps/distal_site_visualization.png)
+![alt text](proof-of-concept/rfd_tf1r_macrocycle/mps/interface_beta4_A209-212_len14/distal_site_visualization.png)
 *Figure 10. Visualization of the selected backbone residue for Asp/Glu/Lys/Cys sequence generation. The lines and spheres represent the idealized geometry of Asp/Glu/Lys/Cys side chains.*
 
 In RFpeptides, the ProteinMPNN sampling temperature was set to `0.0001`, which strongly favors the model’s highest scoring amino acid choices. In my hands, this setting failed to generate valid sequences when paired with residue constraints. Instead, I used a sampling temperature of `0.1`, the standard ProteinMPNN default, which did successfully generate sequences for all backbones. 
