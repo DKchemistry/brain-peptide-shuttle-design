@@ -114,7 +114,7 @@ As described in the original report, I ran four iterative rounds of ProteinMPNN/
 ![alt text](proof-of-concept/rfd_tf1r_macrocycle/mps/interface_beta4_A209-212_len14/distal_site_visualization.png)
 *Figure 10. Visualization of the selected backbone residue for Asp/Glu/Lys/Cys sequence generation. The lines and spheres represent the idealized geometry of Asp/Glu/Lys/Cys side chains.*
 
-In RFpeptides, the ProteinMPNN sampling temperature was set to `0.0001`, which strongly favors the model’s highest scoring amino acid choices. In my hands, this setting failed to generate valid sequences when paired with residue constraints. Instead, I used a sampling temperature of `0.1`, the standard ProteinMPNN default, which did successfully generate sequences for all backbones. 
+In RFpeptides, the ProteinMPNN sampling temperature was set to `0.0001`, which favors the model’s highest scoring amino acid choices. In my hands, this setting failed to generate valid sequences when paired with residue constraints. Instead, I used a sampling temperature of `0.1`, the standard ProteinMPNN default, which did successfully generate sequences for all backbones. 
 
 #### AfCyc Oracle
 
