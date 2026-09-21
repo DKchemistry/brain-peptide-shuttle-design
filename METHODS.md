@@ -178,6 +178,32 @@ python scripts/run_inference.py \
 
 Download and unzip `interface_tensors` from: https://www.nature.com/articles/s41467-025-67866-3. Move to root. 
 
+Note, this script does indeed seem to have an off by one error. 
+
+The issue is in `pair_adjacency()` in `make_interface_tensor.py`.
+
+```py
+def pair_adjacency(block_adj, index, ss_len, binderlen, contig, secstruct_dict):
+    for ss_b in range(index, index + ss_len):
+        for ss_t in range(len(contig)):
+            block_adj[ss_b][
+                contig[ss_t][1] + (binderlen - (secstruct_dict['idx'][0] + 1))
+            ] = 1
+```
+
+
+We have this code snippet that is going going to set positions of the binder/target block adjacency matrix to 1 in order to mark that they are adjacent. The issue is here:
+
+```py
+block_adj[ss_b][
+    contig[ss_t][1] + (binderlen - (secstruct_dict['idx'][0] + 1))
+] = 1
+```
+
+We need to be able to convert an arbitrary start to a PDB to the offset created by prepending the binder. `contig[ss_t]` is a (chain_id, residue_number) tuple, so `contig[ss_t][1]` is residue_number, it is derived from the target PDB. Naively, you might want to just offset it by the binder length, but this will fail because the PDB can start at an arbitrary residue number, while the matrix is zero-indexed. 
+
+If you ask for residue 110 in the target to have adjacency and there are 10 residues in the binder, but the target started at residue 100, we should only be at index 20 of the matrix (requested_residue + binder - pdb_start_residue). In the above though, we add a 1 prior to subtracting. So, we'd be at 19. So when you, the user, selects residues you should increment by 1.
+
 ```sh
 # from root
 conda activate pyrosetta
@@ -185,7 +211,7 @@ conda activate pyrosetta
 # tensor dir
 mkdir -p proof-of-concept/tf1r/interface_beta4_A209-212_len14/tensors
 
-# suspected an off by 1 error due to pdb renumbering,
+# suspected an off by 1 error due to matrix assignment
 # so, --target_adj was A210-213 instead of A209-212
 # needs to be revisited
 python interface_tensors/make_interface_tensor.py \
